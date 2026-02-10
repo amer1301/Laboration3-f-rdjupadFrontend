@@ -17,7 +17,7 @@ export const postsApi = {
         return res.data;
     },
 
-    async update(id: string, payload: BlogPostUpdate): Promise<BlodPost> {
+    async update(id: string, payload: BlogPostUpdate): Promise<BlogPost> {
         const res = await http.put<BlogPost>(`/posts/${id}`, payload);
         return res.data;
     },

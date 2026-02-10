@@ -14,7 +14,7 @@ const LoginPage = () => {
     // Kontrollera användare
     useEffect(() => {
         if(user) {
-            navigate("/profile");
+            navigate('/admin');
         }
     }, [user])
 
@@ -24,7 +24,7 @@ const LoginPage = () => {
 
         try {
             await login({email, password});
-            navigate("{profile");
+            navigate('/admin');
 
         } catch(error) {
             setError("Inloggningen misslyckades. Vänligen kontrollera e-post och lösenord.")
