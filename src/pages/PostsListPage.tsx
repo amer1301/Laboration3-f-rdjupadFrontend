@@ -39,11 +39,12 @@ const PostsListPage = () => {
           <div className="postsGrid">
             {posts.map((p) => (
               <article key={p.id} className="card postCard">
-                <div className="postMedia">
-  {p.coverImageUrl && (
+<div className="postMedia">
+  {p.coverImageUrl ? (
     <img className="postImage" src={p.coverImageUrl} alt={p.title} />
-  )}
+  ) : null}
 </div>
+
 
                 <div className="postBody">
                   <div className="postMeta">

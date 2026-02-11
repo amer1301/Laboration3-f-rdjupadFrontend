@@ -62,7 +62,11 @@ const HomePage = () => {
               {posts.map((p) => (
                 <article key={p.id} className="card postCard">
                   {/* Placeholder “bild” tills du har coverUrl */}
-                  <div className="postMedia" />
+                  <div className="postMedia">
+  {p.coverImageUrl ? (
+    <img className="postImage" src={p.coverImageUrl} alt={p.title} />
+  ) : null}
+</div>
 
                   <div className="postBody">
                     <div className="postMeta">
