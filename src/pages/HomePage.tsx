@@ -1,55 +1,104 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { postsApi } from "../api/postsApi";
-import type { BlogPost } from "../types/blog.types";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { postsApi } from '../api/postsApi';
+import type { BlogPost } from '../types/blog.types';
 
 const HomePage = () => {
-    const [posts, setPosts] = useState<BlogPost[] | null>(null);
-    const [error, setError] = useState<String | null>(null);
+  const [posts, setPosts] = useState<BlogPost[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const all = await postsApi.list();
-                // Visa senaste 3
-                setPosts(all.slice(0, 3));
-            } catch {
-                setError('Kunde inte hämta inlägg. Försök igen senare.');
-            }
-        })();
-    }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const all = await postsApi.list();
+        // Visa senaste 3
+        setPosts(all.slice(0, 3));
+      } catch {
+        setError('Kunde inte hämta inlägg. Försök igen senare.');
+      }
+    })();
+  }, []);
 
-    return (
-        <div>
-            <h1>Min blogg</h1>
-            <p>Här finns de senaste inläggen.</p>
+  return (
+    <>
+      <section className="hero">
+        <div className="container heroInner">
+          <p className="heroKicker">PERSONLIG BLOGG</p>
+          <h1 className="heroTitle">Amandas Journal</h1>
+          <p className="heroLead">
+            Texter om vardag, kreativitet och små saker som gör livet fint.
+          </p>
 
-            {error && <p className="error-messade">{error}</p>}
-
-            {!posts && !error && <p>Laddar...</p>}
-
-            {posts && (
-                <>
-                <h2>Senaste inläggen</h2>
-                {posts.length === 0 ? (
-                    <p>Inga inlägg ännu.</p>
-                ) : (
-                    <ul>
-                        {posts.map((p) => (
-                            <li key={p.id}>
-                                <Link to={`/posts/${p.id}`}>{p.title}</Link>
-                                <div className="muted">{new Date(p.createdAt).toLocaleString()}</div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-                <p>
-                    <Link to="/posts">Visa alla inlägg →</Link>
-                </p>
-                </>
-            )}
+          <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <Link className="btn btnPrimary" to="/posts">
+              Läs bloggen
+            </Link>
+            <Link className="btn" to="/login">
+              Logga in
+            </Link>
+          </div>
         </div>
-    );
+      </section>
+
+      <main className="container">
+        <section style={{ padding: '26px 0 44px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+            <h2 style={{ margin: 0, fontFamily: 'var(--serif)', fontSize: '1.6rem' }}>Senaste inläggen</h2>
+            <Link to="/posts" className="navLink">
+              Visa alla →
+            </Link>
+          </div>
+
+          <hr className="hr" style={{ margin: '14px 0 18px' }} />
+
+          {error && <div className="error">{error}</div>}
+
+          {!posts && !error && <p style={{ color: 'var(--muted)' }}>Laddar…</p>}
+
+          {posts && posts.length === 0 && <p style={{ color: 'var(--muted)' }}>Inga inlägg ännu.</p>}
+
+          {posts && posts.length > 0 && (
+            <div className="postsGrid">
+              {posts.map((p) => (
+                <article key={p.id} className="card postCard">
+                  {/* Placeholder “bild” tills du har coverUrl */}
+                  <div className="postMedia" />
+
+                  <div className="postBody">
+                    <div className="postMeta">
+                      <span>Blogg</span>
+                      <span>•</span>
+                      <span>
+                        {'createdAt' in p && p.createdAt
+                          ? new Date(p.createdAt as string).toLocaleDateString()
+                          : ''}
+                      </span>
+                    </div>
+
+                    <h3 className="postTitle" style={{ marginTop: 10 }}>
+                      <Link to={`/posts/${p.id}`} style={{ textDecoration: 'none' }}>
+                        {p.title}
+                      </Link>
+                    </h3>
+
+                    <p className="postExcerpt">
+                      {p.content?.length > 140 ? `${p.content.slice(0, 140)}…` : p.content}
+                    </p>
+
+                    <div style={{ marginTop: 14 }}>
+                      <Link className="btn" to={`/posts/${p.id}`}>
+                        Läs mer
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+    </>
+  );
 };
 
 export default HomePage;

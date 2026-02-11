@@ -1,17 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { postsApi } from "../api/postsApi";
-import type { BlogPost } from "../types/blog.types";
-import PostForm from "../components/PostForm";
-import type { PostFormValues } from "../components/PostForm";
-
+import { useEffect, useMemo, useState } from 'react';
+import { postsApi } from '../api/postsApi';
+import type { BlogPost } from '../types/blog.types';
+import PostForm from '../components/PostForm';
+import type { PostFormValues } from '../components/PostForm';
 
 const AdminPostsPage = () => {
   const [posts, setPosts] = useState<BlogPost[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [uiError, setUiError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selected = useMemo(() => posts?.find((p) => p.id === selectedId) ?? null, [posts, selectedId]);
+  const selected = useMemo(
+    () => posts?.find((p) => p.id === selectedId) ?? null,
+    [posts, selectedId]
+  );
 
   const refresh = async () => {
     setUiError(null);
@@ -29,9 +32,11 @@ const AdminPostsPage = () => {
   const handleCreate = async (values: PostFormValues) => {
     setIsSubmitting(true);
     setUiError(null);
+    setNotice(null);
     try {
       await postsApi.create(values);
       await refresh();
+      setNotice('Inlägg skapat.');
     } catch {
       setUiError('Kunde inte skapa inlägg (är du inloggad?).');
     } finally {
@@ -40,96 +45,125 @@ const AdminPostsPage = () => {
   };
 
   const handleUpdate = async (values: PostFormValues) => {
-    if (!selected) return;
+    if (!selectedId) return;
     setIsSubmitting(true);
     setUiError(null);
+    setNotice(null);
     try {
-      await postsApi.update(selected.id, values);
+      await postsApi.update(selectedId, values);
       await refresh();
+      setNotice('Inlägg uppdaterat.');
     } catch {
-      setUiError('Kunde inte uppdatera inlägg.');
+      setUiError('Kunde inte uppdatera inlägg (är du inloggad?).');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    const ok = confirm('Vill du verkligen ta bort inlägget?');
+    const ok = confirm('Är du säker på att du vill ta bort inlägget?');
     if (!ok) return;
+
+    setIsSubmitting(true);
     setUiError(null);
+    setNotice(null);
     try {
       await postsApi.remove(id);
       setSelectedId(null);
       await refresh();
+      setNotice('Inlägg borttaget.');
     } catch {
-      setUiError('Kunde inte ta bort inlägg.');
+      setUiError('Kunde inte ta bort inlägg (är du inloggad?).');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <h1>Admin • Blogginlägg</h1>
-      <p className="muted">Här kan du skapa, uppdatera och ta bort inlägg.</p>
+    <main className="container">
+      <section style={{ padding: '26px 0 44px' }}>
+        <div className="pageHeader">
+          <div>
+            <p className="kicker">ADMIN</p>
+            <h1 className="pageTitle">Hantera inlägg</h1>
+          </div>
+        </div>
 
-      {uiError && <p className="error-message">{uiError}</p>}
+        <hr className="hr" style={{ margin: '14px 0 18px' }} />
 
-      <div style={{ display: 'grid', gap: 24, gridTemplateColumns: '1fr 2fr' }}>
-        <section>
-          <h2>Inlägg</h2>
+        {uiError && <div className="error">{uiError}</div>}
+        {notice && <div className="notice">{notice}</div>}
 
-          {!posts && <p>Laddar...</p>}
+        <div className="adminGrid">
+          <div className="card adminPanel">
+            <div className="panelHeader" style={{ marginBottom: 10 }}>
+              <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '1.2rem' }}>
+                {selected ? 'Redigera inlägg' : 'Skapa nytt inlägg'}
+              </h2>
+              <p style={{ margin: '6px 0 0', color: 'var(--muted)' }}>
+                {selected ? 'Uppdatera titel och innehåll.' : 'Skriv och publicera ett nytt inlägg.'}
+              </p>
+            </div>
 
-          {posts && posts.length === 0 && <p>Inga inlägg ännu.</p>}
+            <PostForm
+              disabled={isSubmitting}
+              submitLabel={selected ? 'Spara ändringar' : 'Skapa inlägg'}
+              initialValues={selected ? { title: selected.title, content: selected.content } : undefined}
+              onSubmit={selected ? handleUpdate : handleCreate}
+              onCancel={selected ? () => setSelectedId(null) : undefined}
+            />
+          </div>
 
-          {posts && posts.length > 0 && (
-            <ul>
-              {posts.map((p) => (
-                <li key={p.id} style={{ marginBottom: 12 }}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(p.id)}
-                    style={{ fontWeight: p.id === selectedId ? 700 : 400 }}
+          <div className="card adminPanel">
+            <div className="panelHeader" style={{ marginBottom: 10 }}>
+              <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '1.2rem' }}>
+                Alla inlägg
+              </h2>
+              <p style={{ margin: '6px 0 0', color: 'var(--muted)' }}>
+                Klicka på ett inlägg för att redigera.
+              </p>
+            </div>
+
+            {!posts && <p style={{ color: 'var(--muted)' }}>Laddar…</p>}
+            {posts && posts.length === 0 && <p style={{ color: 'var(--muted)' }}>Inga inlägg ännu.</p>}
+
+            {posts && posts.length > 0 && (
+              <ul className="adminList">
+                {posts.map((p) => (
+                  <li
+                    key={p.id}
+                    className={`adminRow ${selectedId === p.id ? 'active' : ''}`}
                   >
-                    {p.title}
-                  </button>
-                  <div className="muted">{new Date(p.createdAt).toLocaleString()}</div>
-                  <button type="button" onClick={() => handleDelete(p.id)}>
-                    Ta bort
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+                    <button
+                      className="adminPick"
+                      type="button"
+                      onClick={() => setSelectedId(p.id)}
+                      disabled={isSubmitting}
+                    >
+                      <span className="adminTitle">{p.title}</span>
+                      <span className="adminMeta">
+                        {'createdAt' in p && p.createdAt
+                          ? new Date(p.createdAt as string).toLocaleDateString()
+                          : ''}
+                      </span>
+                    </button>
 
-          <button type="button" onClick={() => setSelectedId(null)}>
-            + Nytt inlägg
-          </button>
-        </section>
-
-        <section>
-          {selected ? (
-            <>
-              <h2>Redigera</h2>
-              <PostForm
-                initial={{ title: selected.title, content: selected.content }}
-                submitText={isSubmitting ? 'Sparar...' : 'Spara ändringar'}
-                isSubmitting={isSubmitting}
-                onSubmit={handleUpdate}
-              />
-            </>
-          ) : (
-            <>
-              <h2>Skapa nytt</h2>
-              <PostForm
-                submitText={isSubmitting ? 'Skapar...' : 'Skapa inlägg'}
-                isSubmitting={isSubmitting}
-                onSubmit={handleCreate}
-              />
-            </>
-          )}
-        </section>
-      </div>
-    </div>
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => handleDelete(p.id)}
+                      disabled={isSubmitting}
+                    >
+                      Ta bort
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
 

@@ -5,14 +5,17 @@ export interface BlogPost {
     author: string;
     createdAt: string;
     updatedAt: string;
+    coverImageUrl?: string;
 }
 
 export interface BlogPostCreate {
     title: string;
     content: string;
+    coverImageUrl?: string;
 }
 
 export interface BlogPostUpdate {
     title: string;
     content: string;
+    coverImageUrl?: string;
 }

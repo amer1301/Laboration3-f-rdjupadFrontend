@@ -1,42 +1,199 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.siteHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(251, 250, 248, 0.75);
+  border-bottom: 1px solid var(--border);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.headerInner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 14px 0;
+  gap: 12px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.brand {
+  font-family: var(--serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  justify-self: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.navLeft, .navRight {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 0.95rem;
+  color: var(--muted);
 }
 
-.card {
-  padding: 2em;
+.navRight { justify-self: end; }
+.navLeft { justify-self: start; }
+
+.navLink {
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 999px;
+}
+.navLink:hover { background: rgba(0,0,0,0.03); text-decoration: none; }
+
+@media (max-width: 720px) {
+  .headerInner { grid-template-columns: 1fr; }
+  .brand { justify-self: start; }
+  .navLeft, .navRight { justify-self: start; flex-wrap: wrap; }
 }
 
-.read-the-docs {
-  color: #888;
+.kicker {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+}
+.pageTitle {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 2rem;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+  padding-top: 10px;
+}
+
+.postCard { grid-column: span 6; }
+@media (max-width: 900px) { .postCard { grid-column: span 12; } }
+
+.postMedia {
+  height: 260px;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.05), transparent),
+    radial-gradient(700px 240px at 30% 20%, rgba(217,183,176,0.35), transparent 60%);
+}
+
+.postBody { padding: 16px 16px 18px; }
+
+.postMeta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.postTitle {
+  margin: 10px 0 8px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.postExcerpt {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.article { padding: 26px 0 44px; }
+.articleInner { max-width: 760px; margin: 0 auto; }
+
+
+.articleMedia { height: 320px; background: #f2f0ed; }
+.articleImage { width: 100%; height: 100%; object-fit: cover; display:block; }
+
+.articleTitle {
+  font-family: var(--serif);
+  font-size: 2.2rem;
+  margin: 12px 0 10px;
+}
+
+.articleMeta {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.articleContent {
+  margin-top: 18px;
+  line-height: 1.85;
+  font-size: 1.05rem;
+  color: #2b2b2b;
+  white-space: pre-wrap;
+}
+
+.panel {
+  max-width: 520px;
+  margin: 26px auto 44px;
+  padding: 18px;
+}
+
+.formRow { display: grid; gap: 8px; margin-bottom: 12px; }
+.formActions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+.notice {
+  border: 1px solid rgba(30, 120, 60, 0.22);
+  background: rgba(30, 120, 60, 0.08);
+  padding: 10px 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.adminGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 980px) {
+  .adminGrid { grid-template-columns: 1fr; }
+}
+
+.adminPanel { padding: 18px; }
+
+.adminList {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.adminRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.adminPick {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 12px;
+  cursor: pointer;
+}
+
+.adminRow.active .adminPick {
+  outline: 2px solid rgba(217,183,176,0.35);
+}
+
+.adminTitle {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.adminMeta {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
 }

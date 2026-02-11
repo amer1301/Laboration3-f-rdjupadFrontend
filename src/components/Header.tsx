@@ -1,29 +1,44 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
+  const { user, logout } = useAuth();
 
-    const { user, logout } = useAuth();
+  return (
+    <header className="siteHeader">
+      <div className="container headerInner">
+        <nav className="navLeft">
+          <NavLink className="navLink" to="/">
+            Startsida
+          </NavLink>
+          <NavLink className="navLink" to="/posts">
+            Blogg
+          </NavLink>
+        </nav>
 
-    return (
-        <header>
-            <nav>
-                <ul>
-                    <li><NavLink to="/">Startsida</NavLink></li>
-                    <li><NavLink to="/posts">Blogg</NavLink></li>
-                    
-                    {user && (
-                        <li><NavLink to="/admin">Admin</NavLink></li>
-                    )}
-                    <li>
-                        {
-                            !user ? <NavLink to="/login">Logga in</NavLink> : <button onClick={logout}>Logga ut</button>
-                        }
-                        </li>
-                </ul>
-            </nav>
-        </header>
-    )
-}
+        <Link className="brand" to="/">
+          Amandas Journal
+        </Link>
 
-export default Header
+        <div className="navRight">
+          {user ? (
+            <>
+              <NavLink className="navLink" to="/admin">
+                Admin
+              </NavLink>
+              <button className="btn" onClick={logout} type="button">
+                Logga ut
+              </button>
+            </>
+          ) : (
+            <NavLink className="btn btnPrimary" to="/login">
+              Logga in
+            </NavLink>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

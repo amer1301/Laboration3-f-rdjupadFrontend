@@ -1,79 +1,80 @@
-import { useState, useEffect } from "react";
-import './css/LoginPage.css';
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login, error } = useAuth();
 
-    const {login, user} = useAuth();
-    const navigate = useNavigate();
+  const [email, setEmail] = useState('admin@blogg.se');
+  const [password, setPassword] = useState('password');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-    // Kontrollera användare
-    useEffect(() => {
-        if(user) {
-            navigate('/admin');
-        }
-    }, [user])
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLocalError(null);
+    setIsSubmitting(true);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError('');
+    try {
+      await login({ email, password });
+      navigate('/admin');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Inloggning misslyckades';
+      setLocalError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-        try {
-            await login({email, password});
-            navigate('/admin');
-
-        } catch(error) {
-            setError("Inloggningen misslyckades. Vänligen kontrollera e-post och lösenord.")
-        }
-    };
-
-    return (
-        <div className="login-container">
-            <div className="login-box">
-                <h2>Logga in på ditt konto</h2>
-
-                <form onSubmit={handleSubmit}>
-                    {error && (
-                        <div className="error-message">
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="form-group">
-                        <label htmlFor="email">E-postadress</label>
-                        <input
-                        id="email"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password">Lösenord</label>
-                        <input
-                        id="password"
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    <button
-                    type="submit"
-                    >
-                        Logga in
-                    </button>
-                </form>
-            </div>
+  return (
+    <main className="container">
+      <section className="panel card">
+        <div className="panelHeader">
+          <p className="kicker">ADMIN</p>
+          <h1 style={{ fontFamily: 'var(--serif)', margin: '0 0 6px' }}>Logga in</h1>
+          <p style={{ margin: 0, color: 'var(--muted)' }}>
+            Använd dina uppgifter för att hantera blogginlägg.
+          </p>
         </div>
-    )
-}
 
-export default LoginPage
+        <hr className="hr" style={{ margin: '14px 0 18px' }} />
+
+        {(localError || error) && <div className="error">{localError || error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="formRow">
+            <label htmlFor="email">E-post</label>
+            <input
+              id="email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="formRow">
+            <label htmlFor="password">Lösenord</label>
+            <input
+              id="password"
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+          </div>
+
+          <div className="formActions">
+            <button className="btn btnPrimary" disabled={isSubmitting} type="submit">
+              {isSubmitting ? 'Loggar in…' : 'Logga in'}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  );
+};
+
+export default LoginPage;
