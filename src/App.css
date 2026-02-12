@@ -41,11 +41,6 @@
 }
 .navLink:hover { background: rgba(0,0,0,0.03); text-decoration: none; }
 
-@media (max-width: 720px) {
-  .headerInner { grid-template-columns: 1fr; }
-  .brand { justify-self: start; }
-  .navLeft, .navRight { justify-self: start; flex-wrap: wrap; }
-}
 
 .kicker {
   margin: 0 0 8px;
@@ -67,7 +62,6 @@
 }
 
 .postCard { grid-column: span 6; }
-@media (max-width: 900px) { .postCard { grid-column: span 12; } }
 
 .postBody { padding: 16px 16px 18px; }
 
@@ -143,10 +137,6 @@
   gap: 18px;
 }
 
-@media (max-width: 980px) {
-  .adminGrid { grid-template-columns: 1fr; }
-}
-
 .adminPanel { padding: 18px; }
 
 .adminList {
@@ -202,4 +192,16 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 980px) {
+  .adminGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) { .postCard { grid-column: span 12; } }
+
+@media (max-width: 720px) {
+  .headerInner { grid-template-columns: 1fr; }
+  .brand { justify-self: start; }
+  .navLeft, .navRight { justify-self: start; flex-wrap: wrap; }
 }

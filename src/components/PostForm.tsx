@@ -26,7 +26,6 @@ const PostForm = ({
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Uppdatera formuläret när man väljer ett annat inlägg i admin
   useEffect(() => {
     setTitle(initialValues?.title ?? '');
     setContent(initialValues?.content ?? '');
@@ -64,7 +63,6 @@ const PostForm = ({
         </div>
       )}
 
-      {/* Titel */}
       <div className="formRow">
         <label htmlFor="title">Titel</label>
         <input
@@ -77,7 +75,6 @@ const PostForm = ({
         />
       </div>
 
-      {/* Bild-URL */}
       <div className="formRow">
         <label htmlFor="cover">Bild-URL (valfritt)</label>
         <input
@@ -89,7 +86,6 @@ const PostForm = ({
           placeholder="https://..."
         />
 
-        {/* Live preview av bilden */}
         {coverImageUrl && (
           <div
             style={{
@@ -116,7 +112,6 @@ const PostForm = ({
         )}
       </div>
 
-      {/* Innehåll */}
       <div className="formRow">
         <label htmlFor="content">Innehåll</label>
         <textarea

@@ -51,7 +51,7 @@ function authMiddleware(req, res, next) {
   const [type, token] = header.split(' ');
 
   if (type !== 'Bearer' || !token) {
-    return res.status(401).json({ message: 'Missing token' });
+    return res.status(401).json({ message: 'token saknas' });
   }
 
   try {
@@ -59,16 +59,15 @@ function authMiddleware(req, res, next) {
     req.user = payload;
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: 'Ogiltig token' });
   }
 }
 
-// Auth
 app.post('/auth/login', (req, res) => {
   const { email, password } = req.body ?? {};
 
   if (email !== DEMO_USER.email || password !== DEMO_USER.password) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ message: 'ogiltiga autentiseringsuppgifter' });
   }
 
   const token = signToken(DEMO_USER);
@@ -93,20 +92,17 @@ app.get('/auth/validate', authMiddleware, (req, res) => {
   res.json({ user });
 });
 
-// Public posts
 app.get('/posts', (req, res) => {
-  // nyast först
   const sorted = [...posts].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   res.json(sorted);
 });
 
 app.get('/posts/:id', (req, res) => {
   const post = posts.find((p) => p.id === req.params.id);
-  if (!post) return res.status(404).json({ message: 'Not found' });
+  if (!post) return res.status(404).json({ message: 'Inte hittad' });
   res.json(post);
 });
 
-// Protected CRUD
 app.post('/posts', authMiddleware, (req, res) => {
   const { title, content, coverImageUrl } = req.body ?? {};
 
@@ -134,7 +130,7 @@ app.put('/posts/:id', authMiddleware, (req, res) => {
   const { title, content, coverImageUrl } = req.body ?? {};
   const idx = posts.findIndex((p) => p.id === req.params.id);
 
-  if (idx === -1) return res.status(404).json({ message: 'Not found' });
+  if (idx === -1) return res.status(404).json({ message: 'Inte hittad' });
 
   if (!title || !content) {
     return res.status(400).json({ message: 'title och content är obligatoriska' });
@@ -144,7 +140,6 @@ app.put('/posts/:id', authMiddleware, (req, res) => {
     ...posts[idx],
     title: String(title),
     content: String(content),
-    // Om man skickar coverImageUrl i requesten så uppdateras den, annars behålls den gamla
     coverImageUrl:
       typeof coverImageUrl === 'string' ? coverImageUrl : posts[idx].coverImageUrl ?? '',
     updatedAt: new Date().toISOString(),
@@ -155,7 +150,7 @@ app.put('/posts/:id', authMiddleware, (req, res) => {
 
 app.delete('/posts/:id', authMiddleware, (req, res) => {
   const idx = posts.findIndex((p) => p.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ message: 'Not found' });
+  if (idx === -1) return res.status(404).json({ message: 'Inte hittad' });
 
   posts.splice(idx, 1);
   res.status(204).send();

@@ -3,6 +3,7 @@ import { postsApi } from '../api/postsApi';
 import type { BlogPost } from '../types/blog.types';
 import PostForm from '../components/PostForm';
 import type { PostFormValues } from '../components/PostForm';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminPostsPage = () => {
   const [posts, setPosts] = useState<BlogPost[] | null>(null);
@@ -11,9 +12,16 @@ const AdminPostsPage = () => {
   const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [postToDeleteId, setPostToDeleteId] = useState<string | null>(null);
+
   const selected = useMemo(
     () => posts?.find((p) => p.id === selectedId) ?? null,
     [posts, selectedId]
+  );
+
+  const postToDelete = useMemo(
+    () => posts?.find((p) => p.id === postToDeleteId) ?? null,
+    [posts, postToDeleteId]
   );
 
   const refresh = async () => {
@@ -60,16 +68,23 @@ const AdminPostsPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const ok = confirm('Är du säker på att du vill ta bort inlägget?');
-    if (!ok) return;
+  const requestDelete = (id: string) => {
+    setPostToDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!postToDeleteId) return;
 
     setIsSubmitting(true);
     setUiError(null);
     setNotice(null);
+
     try {
-      await postsApi.remove(id);
-      setSelectedId(null);
+      await postsApi.remove(postToDeleteId);
+
+      if (selectedId === postToDeleteId) setSelectedId(null);
+
+      setPostToDeleteId(null);
       await refresh();
       setNotice('Inlägg borttaget.');
     } catch {
@@ -105,10 +120,30 @@ const AdminPostsPage = () => {
               </p>
             </div>
 
+            <div className="admin-header">
+              <h2>Hantera inlägg</h2>
+
+              <button
+                onClick={() => setSelectedId(null)}
+                className="btn btn-primary"
+              >
+                Nytt inlägg
+              </button>
+            </div>
+
             <PostForm
+              key={selectedId ?? 'new'}
               disabled={isSubmitting}
               submitLabel={selected ? 'Spara ändringar' : 'Skapa inlägg'}
-              initialValues={selected ? { title: selected.title, content: selected.content } : undefined}
+              initialValues={
+                selected
+                  ? {
+                      title: selected.title,
+                      content: selected.content,
+                      coverImageUrl: selected.coverImageUrl ?? '',
+                    }
+                  : undefined
+              }
               onSubmit={selected ? handleUpdate : handleCreate}
               onCancel={selected ? () => setSelectedId(null) : undefined}
             />
@@ -151,7 +186,7 @@ const AdminPostsPage = () => {
                     <button
                       className="btn"
                       type="button"
-                      onClick={() => handleDelete(p.id)}
+                      onClick={() => requestDelete(p.id)}
                       disabled={isSubmitting}
                     >
                       Ta bort
@@ -162,6 +197,20 @@ const AdminPostsPage = () => {
             )}
           </div>
         </div>
+
+        <ConfirmModal
+          isOpen={!!postToDeleteId}
+          title="Ta bort inlägg"
+          message={
+            postToDelete?.title
+              ? `Vill du verkligen ta bort "${postToDelete.title}"?`
+              : 'Vill du verkligen ta bort det här inlägget?'
+          }
+          confirmText={isSubmitting ? 'Tar bort…' : 'Ta bort'}
+          cancelText="Avbryt"
+          onConfirm={confirmDelete}
+          onCancel={() => setPostToDeleteId(null)}
+        />
       </section>
     </main>
   );

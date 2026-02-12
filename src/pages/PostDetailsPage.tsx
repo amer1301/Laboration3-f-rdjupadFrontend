@@ -21,42 +21,59 @@ const PostDetailsPage = () => {
     })();
   }, [id]);
 
-  return (
-    <main className="container">
-      <section className="article">
-        <div className="articleInner">
-          <Link className="btn" to="/posts">
-            ← Tillbaka
-          </Link>
+return (
+  <main className="container">
+    <section className="article">
+      <div className="articleInner">
+        <Link className="btn" to="/posts">
+          ← Tillbaka
+        </Link>
 
-          {error && <div className="error" style={{ marginTop: 14 }}>{error}</div>}
-          {!post && !error && <p style={{ color: 'var(--muted)', marginTop: 14 }}>Laddar…</p>}
+        {error && (
+          <div className="error" style={{ marginTop: 14 }}>
+            {error}
+          </div>
+        )}
 
-          {post && (
-            <>
-              <div className="articleHero card" style={{ marginTop: 16 }}>
+        {!post && !error && (
+          <p style={{ color: "var(--muted)", marginTop: 14 }}>Laddar…</p>
+        )}
+
+        {post && (
+          <>
+            <div className="articleHero card" style={{ marginTop: 16 }}>
+              {post.coverImageUrl ? (
+                <img
+                  src={post.coverImageUrl}
+                  alt={post.title}
+                  className="articleImage"
+                />
+              ) : (
                 <div className="articleMedia" />
-              </div>
+              )}
+            </div>
 
-              <p className="articleMeta" style={{ marginTop: 16 }}>
-                Blogg
-                {'createdAt' in post && post.createdAt ? (
-                  <>
-                    <span> • </span>
-                    <span>{new Date(post.createdAt as string).toLocaleString()}</span>
-                  </>
-                ) : null}
-              </p>
+            <p className="articleMeta" style={{ marginTop: 16 }}>
+              Blogg
+              {"createdAt" in post && post.createdAt ? (
+                <>
+                  <span> • </span>
+                  <span>
+                    {new Date(post.createdAt as string).toLocaleString()}
+                  </span>
+                </>
+              ) : null}
+            </p>
 
-              <h1 className="articleTitle">{post.title}</h1>
+            <h1 className="articleTitle">{post.title}</h1>
 
-              <div className="articleContent">{post.content}</div>
-            </>
-          )}
-        </div>
-      </section>
-    </main>
-  );
-};
+            <div className="articleContent">{post.content}</div>
+          </>
+        )}
+      </div>
+    </section>
+  </main>
+);
+}
 
 export default PostDetailsPage;

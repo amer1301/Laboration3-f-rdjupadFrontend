@@ -75,7 +75,7 @@ a:hover { text-decoration: underline; }
   background: #fff;
   font: inherit;
 }
-label { font-size: 0.9rem; color: var(--muted); }
+label { margin-top: 0.5em; font-size: 0.9rem; color: var(--muted); }
 
 .error {
   border: 1px solid rgba(180, 60, 60, 0.35);
@@ -119,3 +119,35 @@ label { font-size: 0.9rem; color: var(--muted); }
   font-size: 1.05rem;
   line-height: 1.6;
 }
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn.danger {
+  background: #000000;
+  color: white;
+}
+
